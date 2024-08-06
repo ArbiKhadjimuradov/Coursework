@@ -25,3 +25,9 @@ def read_excel_file(filename: str) -> Any:
     except Exception as e:
         read_excel_logger.error(f"Произошла ошибка {e} при считывание информации с EXCEL-файла")
         return f"Ошибка {e}. повторите попытку"
+
+
+def read_defolt_exel(filename: str) -> Any:
+    """Считывает данные с EXCEL файла"""
+    df = pd.read_excel("../data/operations.xlsx")
+    return df

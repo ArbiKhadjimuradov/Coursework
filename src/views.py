@@ -1,17 +1,10 @@
 import datetime
 import json
 import logging
-
 import pandas as pd
+from src.utils import (get_card_number_mask, get_exchange_rates,
+                       greetings_user, share_price, top_transaction)
 
-from src.utils import get_card_number_mask, get_exchange_rates, greetings_user, share_price, top_transaction
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s = - %(name)s - %(levelname)s - %(message)s",
-    filename="../log/views.txt",
-    filemode="w",
-)
 
 opening_logger = logging.getLogger("opening_file")
 views_logger = logging.getLogger("views")
@@ -43,7 +36,7 @@ def views(data: str) -> str:
 
     views_logger.info("Сортировка платежа по дате")
 
-    with open("../user_settings.json", encoding="utf-8") as f:
+    with open("../data/user_settings.json", encoding="utf-8") as f:
         load_json = json.load(f)
 
     views_logger.info("Открылся файл")

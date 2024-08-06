@@ -1,7 +1,10 @@
 import datetime
+import datetime as dt
 import logging
+from pathlib import Path
 
 import pandas as pd
+from src.read_file import read_excel_file, read_defolt_exel
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,6 +15,8 @@ logging.basicConfig(
 
 decorator_logger = logging.getLogger("spending_result")
 spending_by_category_logger = logging.getLogger("spending_by_category")
+
+ROOT_PATH = Path(__file__).resolve().parent.parent
 
 
 def spending_result(path_file: str = "../data/test_to_operation.xlsx"):
@@ -32,24 +37,21 @@ def spending_result(path_file: str = "../data/test_to_operation.xlsx"):
 @spending_result()
 def spending_by_category(transactions: pd.DataFrame, category: str, date: str = None) -> pd.DataFrame:
     """Функция возвращает траты по заданной категории за последние три месяца."""
-    sort_transaction = transactions.sort_values(by="Дата платежа", ascending=False)
-
     if date is None:
-        date = datetime.datetime.now().strftime("%d.%m.%Y")
-
-    date_split = date.split(".")
-    three_months_ago = int(date_split[1]) - 4
-
-    date_obj = datetime.datetime.strptime(date, "%d.%m.%Y")
-    date_three_month_ago = date_obj.replace(month=three_months_ago)
-
-    slice_ = date_three_month_ago.strftime("%d.%m.%Y")
-
-    file_to_data = sort_transaction[
-        (sort_transaction["Дата платежа"] >= slice_) & (sort_transaction["Дата платежа"] <= date)
+        fin_data = dt.datetime.now()
+    else:
+        fin_data = datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
+    start_data = fin_data.replace(hour=0, minute=0, second=0, microsecond=0) - datetime.timedelta(days=91)
+    transactions_by_category = transactions.loc[
+        (pd.to_datetime(transactions["Дата операции"], dayfirst=True) <= fin_data)
+        & (pd.to_datetime(transactions["Дата операции"], dayfirst=True) >= start_data)
+        & (transactions["Категория"] == category)
         ]
+    return transactions_by_category
 
-    sort_by_category = file_to_data[(file_to_data["Категория"] == category)]
 
-    spending_by_category_logger.info("Функция запустилась")
-    return pd.DataFrame(sort_by_category)
+operation = read_excel_file("../data/operations.xlsx")
+if __name__ == "__main__":
+    result = spending_by_category(read_defolt_exel(str(ROOT_PATH) + "../data/operations.xlsx"), "Аптеки",
+                                  "26.07.2019 20:58:55")
+    print(result)

@@ -1,6 +1,6 @@
+import logging
 import datetime
 import json
-import logging
 import os
 from typing import LiteralString
 
@@ -14,14 +14,6 @@ API_KEY_RATES = os.getenv("API_KEY_RATES")
 API_KEY_RA = os.getenv("API_KEY_CURRENCY")
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s = - %(name)s - %(levelname)s - %(message)s",
-    filename="../log/utils.txt",
-    filemode="w",
-    encoding="utf8",
-)
-
 greeting_logger = logging.getLogger("greeting")
 info_cards_logger = logging.getLogger("get_card_number_mask")
 top_transactions_logger = logging.getLogger("top_transactions")
@@ -31,18 +23,18 @@ exchange_rates_logger = logging.getLogger("get_exchange_rates")
 share_price_logger = logging.getLogger("share_price")
 
 
-with open("user_settings.json", encoding="utf8") as f:
+with open('../data/user_settings.json') as f:
     load_json = json.load(f)
 
 
 def greetings_user():
     time = datetime.datetime.now().hour
     greeting_logger.info("Фукнция запустилась")
-    if time >= 0 and time <= 7:
+    if 0 <= time <= 7:
         return "Доброй ночи"
-    elif time >= 6 and time <= 13:
+    elif 6 <= time <= 13:
         return "Доброе утро"
-    elif time >= 12 and time <= 18:
+    elif 12 <= time <= 18:
         return "Добрый день"
     else:
         return "Добрый вечер"
@@ -125,7 +117,5 @@ if __name__ == "__main__":
     print(greetings_user())
     print(get_card_number_mask(exel_card))
     print(top_transaction(exel_transaction))
-    print(get_cashback(exel_cashback))
     print(get_exchange_rates(load_json["user_currencies"]))
-    print(get_expenses_all_sum(exel_all_sum))
     print(share_price(load_json["user_stocks"]))
